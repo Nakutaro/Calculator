@@ -8,15 +8,23 @@ namespace CalculatorHelper
 {
     public class Calculator
     {
+        public Calculator(IEnumerable<IOperation> opers)
+        {
+            operations = opers;
+        }
         public Calculator(IOperation[] opers)
         {
             operations = opers;
         }
-        private IOperation[] operations { get; set; }
+        private IEnumerable<IOperation> operations { get; set; }
 
         public object Execute(string name, object[] args)
         {
             var oper = operations.FirstOrDefault(o => o.Name == name);
+            if (oper == null)
+            {
+                return $"Operation\"{name}\"not found";
+            }
             return oper.Execute(args);
         }
     }
@@ -32,7 +40,9 @@ namespace CalculatorHelper
         public string Name { get { return "Sum"; } }
         public object Execute(object[] args)
         {
-            return (int)args[0] + (int)args[1];
+            var x = Convert.ToInt32(args[1]);
+            var y = Convert.ToInt32(args[0]);
+            return x+y;
         }
     }
 
