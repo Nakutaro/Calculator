@@ -20,14 +20,25 @@ namespace CalculatorHelper
 
         public object Execute(string name, object[] args)
         {
-            var oper = operations.FirstOrDefault(o => o.Name == name);
+            var opers = operations.Where(o => o.Name == name);
+            if (!opers.Any())
+                return $"Operation\"{name}\"not found";
+            //из всех операций выделяем только операции с заданнымым количеством аргументов
+            var opersWithCount = opers.OfType<IOperationCount>();
+            var oper = opersWithCount.FirstOrDefault(o => o.Count == args.Count()) ?? opers.FirstOrDefault();
+
             if (oper == null)
             {
                 return $"Operation\"{name}\"not found";
             }
-            return oper.Execute(args);
+            return opers.Execute(args);
+        }
+        public IEnumerable<string> GetOperationNames()
+        {
+            return operations.Select(o => o.Name);
         }
     }
+
 
     public interface IOperation //только описание мтодов в intarface
     {
@@ -35,6 +46,13 @@ namespace CalculatorHelper
         object Execute(object[] args);
     }
 
+    public interface IOperationCount: IOperation
+    {
+        /// <summary>
+        /// Количество аргументов в операции 
+        /// </summary>
+        int Count { get; }
+    }
     public class SumOperation : IOperation//операция суммирования аргументов
     {
         public string Name { get { return "Sum"; } }
@@ -42,7 +60,7 @@ namespace CalculatorHelper
         {
             var x = Convert.ToInt32(args[1]);
             var y = Convert.ToInt32(args[0]);
-            return x+y;
+            return x + y;
         }
     }
 
@@ -60,7 +78,7 @@ namespace CalculatorHelper
         public string Name { get { return "Cube"; } }
         public object Execute(object[] args)
         {
-            return (int)args[0] * (int)args[0]* (int)args[0];
+            return (int)args[0] * (int)args[0] * (int)args[0];
         }
     }
 
@@ -71,6 +89,18 @@ namespace CalculatorHelper
         {
             int n = 10;
             return (int)(Math.Exp(n));
+        }
+    }
+
+    public class DivOperation : IOperationCount
+    {
+        public int Count { get { return 1; } }
+        public string Name { get { return "Sum"; } }
+        public object Execute(object[] args)
+        {
+            var x = Convert.ToInt32(args[1]);
+            var y = Convert.ToInt32(args[0]);
+            return x + y;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Main
             var files = Directory.GetFiles(Environment.CurrentDirectory, "*.dll").
                 Union(Directory.GetFiles(Environment.CurrentDirectory, "*.exe"));
             //загрузить файлы
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 var assembly = Assembly.LoadFile(file);
                 var types = assembly.GetTypes();
